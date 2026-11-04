@@ -1,0 +1,2078 @@
+/* ===== Гримуар Арии: Полная постановка «Хроники Хандера» (Пиксель-арт RPG стиль) ===== */
+:root {
+  --bg-deep: #0b0804;
+  --bg-board: #1a1408;
+  --bg-board-light: #2b1f0e;
+  --gold: #d4af37;
+  --gold-bright: #f5cf47;
+  --gold-dim: #7a6321;
+  --accent-red: #8f1f1f;
+  --accent-red-hover: #b32727;
+  --text-parchment: #e8d9a0;
+  --text-muted: #a89968;
+  --shadow-pixel: 3px 3px 0 #000;
+  --shadow-pixel-lg: 4px 4px 0 #000;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'VT323', monospace;
+  background-color: var(--bg-deep);
+  color: var(--text-parchment);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  font-size: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Пиксельные кнопки */
+.pixelBtn, .smallBtn, .hudBtn {
+  font-family: 'VT323', monospace;
+  background: var(--bg-board-light);
+  color: var(--gold);
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow-pixel);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1.1;
+  transition: transform 0.05s, background-color 0.1s;
+  image-rendering: pixelated;
+}
+
+.pixelBtn {
+  font-size: 22px;
+  padding: 10px 16px;
+}
+
+.pixelBtn.secondary {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+  font-size: 20px;
+  padding: 8px 14px;
+}
+
+.pixelBtn.danger, .smallBtn.danger {
+  background: #381010;
+  border-color: #d9534f;
+  color: #ffcccc;
+}
+
+.pixelBtn:disabled, .smallBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.smallBtn {
+  font-size: 18px;
+  padding: 6px 12px;
+}
+
+.pixelBtn:active:not(:disabled), .smallBtn:active:not(:disabled), .hudBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* --- СТАРТОВЫЙ ЭКРАН --- */
+#startScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: radial-gradient(circle at 50% 35%, #2b1f0e 0%, #0b0804 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.startBox {
+  width: min(540px, 95vw);
+  background: rgba(26, 20, 8, 0.96);
+  border: 4px solid var(--gold);
+  box-shadow: var(--shadow-pixel-lg);
+  padding: 20px 18px;
+  text-align: center;
+  position: relative;
+}
+
+.startPortraitsRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.startHeroImg {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--gold);
+  background: #140f07;
+  image-rendering: pixelated;
+}
+
+.startBox h1 {
+  font-size: clamp(30px, 8.5vw, 48px);
+  color: var(--gold-bright);
+  text-shadow: 3px 3px 0 #000;
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: 21px;
+  color: var(--gold);
+  margin-top: 4px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.lorePrologue {
+  margin: 14px 0;
+  padding: 12px;
+  background: rgba(11, 8, 4, 0.75);
+  border: 2px dashed var(--gold-dim);
+  font-size: 19px;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--text-parchment);
+}
+
+.startActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.startHint {
+  margin-top: 12px;
+  font-size: 18px;
+  opacity: 0.75;
+  animation: pulse 1.8s infinite;
+}
+
+/* --- КАРТА LEAFLET --- */
+#map {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: #110e08;
+  filter: sepia(0.32) saturate(0.75) contrast(1.05);
+}
+
+.location-marker {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  background: var(--bg-board);
+  color: var(--gold);
+  border: 3px solid var(--gold);
+  box-shadow: 2px 2px 0 #000;
+  filter: drop-shadow(2px 2px 0 #000);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.location-marker.next {
+  font-size: 28px;
+  border-color: var(--gold-bright);
+  background: #3a2a12;
+  color: var(--gold-bright);
+  box-shadow: 0 0 12px rgba(245, 207, 71, 0.9), var(--shadow-pixel);
+  animation: bob 1.8s infinite ease-in-out;
+}
+
+.location-marker.done {
+  background: #1b2818;
+  border-color: #2ecc71;
+  color: #2ecc71;
+  animation: none;
+}
+
+.player-marker {
+  width: 20px;
+  height: 20px;
+  background: var(--gold-bright);
+  border: 3px solid #000;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffd700;
+  animation: playerPulse 1.5s infinite;
+}
+
+@keyframes playerPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.4; }
+}
+
+/* --- ВЕРХНИЙ HUD --- */
+#hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  padding: calc(6px + var(--safe-top)) 10px 6px;
+  background: rgba(20, 14, 5, 0.95);
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hudLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.hudTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#questTitle {
+  font-size: 22px;
+  color: var(--gold-bright);
+  line-height: 1;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.hpBadge {
+  font-size: 17px;
+  background: #381010;
+  color: #ff9999;
+  border: 2px solid #c0392b;
+  padding: 1px 6px;
+}
+
+#cityIndicator {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.hudRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.hudBtn {
+  font-size: 18px;
+  padding: 4px 8px;
+  background: var(--bg-board-light);
+  color: var(--gold);
+  position: relative;
+}
+
+.hudBtn.goldBtn {
+  border-color: var(--gold-bright);
+  color: var(--gold-bright);
+  background: #33240a;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 14px;
+  padding: 1px 5px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+/* --- ПЛАВАЮЩИЙ ТРЕКЕР ЦЕЛИ --- */
+#targetTracker {
+  position: fixed;
+  bottom: calc(12px + var(--safe-bottom));
+  left: 10px;
+  right: 10px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.targetCard {
+  pointer-events: auto;
+  background: rgba(26, 20, 8, 0.95);
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow-pixel);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.targetInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.targetLabel {
+  font-size: 15px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.targetName {
+  font-size: 20px;
+  color: var(--gold-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.15;
+}
+
+.targetDistance {
+  font-size: 17px;
+  color: var(--text-parchment);
+}
+
+.targetActions {
+  display: flex;
+  gap: 6px;
+}
+
+.manualOpenBtn {
+  font-size: 18px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  background: var(--accent-red);
+  color: #fff;
+  border-color: var(--gold);
+}
+
+.inspirationBadgeBtn {
+  font-size: 18px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+/* --- ДИАЛОГОВОЕ ОКНО (Прямое разделение: 📱 Эфир Гримуара vs 🎭 Живая сцена в реальности) --- */
+#dialogBox {
+  position: fixed;
+  z-index: 800;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(640px, 100vw);
+  max-height: 80vh;
+  background: var(--bg-board);
+  border: 4px solid var(--gold);
+  border-bottom: none;
+  box-shadow: 0 -4px 14px rgba(0,0,0,0.85);
+  padding: 10px 14px calc(18px + var(--safe-bottom));
+  min-height: 29vh;
+  cursor: pointer;
+  overflow-y: auto;
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Режим 1: 📱 ЭФИР ГРИМУАРА (Тоник и цифровые духи в пути/смартфоне) */
+#dialogBox.mode-digital {
+  background: linear-gradient(180deg, #0b1626 0%, #070e18 100%);
+  border-color: #00e5ff;
+  box-shadow: 0 -4px 18px rgba(0, 229, 255, 0.35);
+}
+
+#dialogBox.mode-digital .dialogModeBanner {
+  background: rgba(0, 229, 255, 0.16);
+  border: 2px solid #00e5ff;
+  color: #76ffff;
+}
+
+#dialogBox.mode-digital #dialogName {
+  color: #76ffff;
+  border-color: #00acc1;
+  background: rgba(0, 25, 45, 0.75);
+}
+
+#dialogBox.mode-digital #portrait {
+  border-color: #00e5ff;
+  background-color: #06101c;
+}
+
+/* Режим 2: 🎭 ЖИВАЯ СЦЕНА В РЕАЛЬНОСТИ (Действия в квартире / на локации с реальными людьми) */
+#dialogBox.mode-live {
+  background: linear-gradient(180deg, #241809 0%, #160f05 100%);
+  border-color: var(--gold-bright);
+  box-shadow: 0 -4px 18px rgba(245, 207, 71, 0.38);
+}
+
+#dialogBox.mode-live .dialogModeBanner {
+  background: rgba(245, 207, 71, 0.18);
+  border: 2px solid var(--gold-bright);
+  color: var(--gold-bright);
+}
+
+.dialogModeBanner {
+  font-size: 16px;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  margin-bottom: 6px;
+  margin-right: 108px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: bold;
+  background: rgba(212, 175, 55, 0.15);
+  border: 2px solid var(--gold);
+  color: var(--gold-bright);
+}
+
+#dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px dashed var(--gold-dim);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  padding-right: 112px;
+}
+
+#dialogName {
+  color: var(--gold-bright);
+  font-size: 23px;
+  letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.45);
+  padding: 2px 8px;
+  border: 1px solid var(--gold-dim);
+}
+
+#portrait {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 96px;
+  height: 96px;
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow-pixel);
+  background-color: #140f07;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+#dialogText {
+  font-size: 22px;
+  line-height: 1.28;
+  min-height: 4.5em;
+  padding-right: 102px;
+  white-space: pre-wrap;
+  color: var(--text-parchment);
+}
+
+#dialogNext {
+  position: absolute;
+  right: 14px;
+  bottom: calc(8px + var(--safe-bottom));
+  color: var(--gold-bright);
+  font-size: 19px;
+  animation: pulse 1.2s infinite;
+}
+
+/* --- ЭКРАН-ПЕРЕХОД МЕЖДУ ДИАЛОГОМ С ТОНИКОМ И РЕАЛЬНОЙ СЦЕНОЙ В КВАРТИРЕ / НА ЛОКАЦИИ --- */
+#sceneTransitionModal {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  background: rgba(8, 6, 3, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.transitionCard {
+  width: min(540px, 95vw);
+  background: linear-gradient(180deg, #26190a 0%, #140d05 100%);
+  border: 4px solid var(--gold-bright);
+  box-shadow: 0 0 24px rgba(245, 207, 71, 0.4), var(--shadow-pixel-lg);
+  padding: 20px 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transitionBadge {
+  align-self: center;
+  background: #381010;
+  color: var(--gold-bright);
+  border: 2px solid var(--gold-bright);
+  padding: 4px 12px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.transitionTitle {
+  font-size: 28px;
+  color: var(--gold-bright);
+  text-shadow: 2px 2px 0 #000;
+  line-height: 1.15;
+}
+
+.transitionText {
+  font-size: 21px;
+  line-height: 1.32;
+  color: var(--text-parchment);
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px dashed var(--gold-dim);
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.transitionBtn {
+  width: 100%;
+  background: var(--accent-red);
+  color: #fff;
+  border-color: var(--gold-bright);
+  font-size: 23px;
+  padding: 12px 16px;
+  margin-top: 4px;
+}
+
+/* Ветвящиеся выборы в диалоге */
+.dialogChoicesList {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialogChoiceBtn {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  text-align: left;
+  padding: 8px 12px;
+  background: #22180b;
+  color: var(--text-parchment);
+  border: 2px solid var(--gold);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.dialogChoiceBtn:hover {
+  background: #33240f;
+  color: var(--gold-bright);
+}
+
+.dialogChoiceBtn.visited {
+  border-color: var(--gold-dim);
+  color: var(--text-muted);
+}
+
+.dialogChoiceBtn.finishBranchBtn {
+  background: #381010;
+  border-color: var(--gold-bright);
+  color: var(--gold-bright);
+  text-align: center;
+  font-size: 21px;
+  margin-top: 4px;
+}
+
+/* --- МОДАЛЬНОЕ ОКНО МИНИ-ИГР, ЛЕТОПИСИ И БИБЛИОТЕКИ (z-index выше #finale!) --- */
+#minigameModal, #journalModal, #charactersModal, #characterDetailModal, #treasuryModal {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(11, 8, 4, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+#characterDetailModal {
+  z-index: 2200;
+}
+
+.minigameCard, .journalCard {
+  width: min(600px, 96vw);
+  max-height: 92vh;
+  background: var(--bg-board);
+  border: 4px solid var(--gold);
+  box-shadow: var(--shadow-pixel-lg);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  position: relative;
+  overflow-y: auto;
+}
+
+.riddleHeader, .journalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--gold);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.riddleTitle, .journalHeader h2 {
+  font-size: 25px;
+  color: var(--gold-bright);
+}
+
+.minigameBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mgDescription {
+  font-size: 20px;
+  line-height: 1.28;
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px solid var(--gold-dim);
+  padding: 10px 12px;
+  color: var(--text-parchment);
+}
+
+.mgDescription.combatAlert {
+  border-color: #e74c3c;
+  background: rgba(56, 16, 16, 0.75);
+}
+
+.mgGrid2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mgSymbolCard {
+  font-family: 'VT323', monospace;
+  background: #22180b;
+  border: 3px solid var(--gold-dim);
+  color: var(--text-parchment);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.mgSymbolCard.selected {
+  border-color: var(--gold-bright);
+  background: #3d2c12;
+  color: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(245, 207, 71, 0.65);
+}
+
+.mgSymIcon {
+  font-size: 38px;
+}
+
+.mgSymLabel {
+  font-size: 19px;
+  text-align: center;
+}
+
+.mgFeedback {
+  padding: 8px 10px;
+  background: #140f07;
+  border-left: 4px solid var(--gold-bright);
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--gold-bright);
+}
+
+.mgFullBtn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Сортировка свитков Клока */
+.mgSortList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mgSortItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 8px 10px;
+}
+
+.mgSortNum {
+  font-size: 22px;
+  color: var(--gold-bright);
+  font-weight: bold;
+}
+
+.mgSortText {
+  flex: 1;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.mgSortBtns {
+  display: flex;
+  gap: 4px;
+}
+
+/* Карты Валтасара */
+.mgCardsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mgArcaneCard {
+  background: #1c102b;
+  border: 3px solid var(--gold);
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.mgArcaneCard:hover {
+  transform: translateY(-4px);
+}
+
+.mgArcaneCard.glowPortent {
+  border-color: #00e5ff;
+  background: #0d2b3e;
+  box-shadow: 0 0 16px #00e5ff;
+  animation: bob 1.4s infinite;
+}
+
+.mgCardIcon {
+  font-size: 40px;
+  margin-bottom: 6px;
+}
+
+/* Кольца Элодеи */
+.mgRingsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mgRingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 8px 12px;
+}
+
+.mgRingRow.aligned {
+  border-color: #2ecc71;
+  background: #132a1c;
+}
+
+.mgRingTitle {
+  font-size: 20px;
+  color: var(--gold-bright);
+}
+
+/* Камни Касыма */
+.mgGemsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mgGemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 8px 12px;
+  font-size: 20px;
+}
+
+.mgCounterCtrl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  color: var(--gold-bright);
+}
+
+.mgChoicesCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mgCombatStatus {
+  padding: 10px;
+  background: #1d0c26;
+  border: 2px solid #e040fb;
+  color: #f3e5f5;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* Рунная Скрижаль Шифра */
+.cipherTablet {
+  background: #120d06;
+  border: 3px solid var(--gold-bright);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cipherHeader {
+  font-size: 21px;
+  color: var(--gold-bright);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.cipherPrompt {
+  font-size: 19px;
+  color: var(--text-parchment);
+  line-height: 1.2;
+}
+
+.cipherInput {
+  width: 100%;
+  font-family: 'VT323', monospace;
+  font-size: 25px;
+  background: #000;
+  color: var(--gold-bright);
+  border: 3px solid var(--gold);
+  padding: 8px 12px;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+}
+
+.cipherError {
+  font-size: 18px;
+  color: #ff8a80;
+  background: rgba(56, 16, 16, 0.65);
+  padding: 6px 8px;
+  border: 1px solid #d9534f;
+}
+
+.cipherActions {
+  display: flex;
+  gap: 8px;
+}
+
+.cipherSubmitBtn {
+  flex: 1;
+}
+
+/* Аудио-депеша Оривии */
+.mgAudioPlayer {
+  background: #091a0d;
+  border: 3px solid #2ecc71;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mgAudioHeader {
+  color: #2ecc71;
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.mgWaveBars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+}
+
+.mgWaveBars span {
+  width: 6px;
+  height: 100%;
+  background: #2ecc71;
+  animation: waveAnim 0.8s infinite ease-in-out alternate;
+}
+
+.mgWaveBars span:nth-child(2n) { animation-delay: 0.2s; }
+.mgWaveBars span:nth-child(3n) { animation-delay: 0.4s; }
+
+@keyframes waveAnim {
+  0% { transform: scaleY(0.25); }
+  100% { transform: scaleY(1); }
+}
+
+.mgAudioTranscript, .mgLetterContent {
+  font-size: 19px;
+  line-height: 1.3;
+  color: #e8f8f5;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border: 1px dashed #2ecc71;
+}
+
+.mgLetterScroll {
+  background: #24190b;
+  border: 3px solid var(--gold);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mgLetterHeader {
+  font-size: 21px;
+  color: var(--gold-bright);
+}
+
+/* Манометр Ртутника */
+.mgGaugeBar {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  background: linear-gradient(90deg, #c0392b 0%, #c0392b 38%, #27ae60 38%, #27ae60 77%, #c0392b 77%, #c0392b 100%);
+  border: 3px solid var(--gold);
+  overflow: hidden;
+}
+
+.mgGaugeSafeZone {
+  position: absolute;
+  left: 38%;
+  width: 39%;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dashed #fff;
+  border-right: 2px dashed #fff;
+}
+
+.mgGaugeNeedle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 8px #000;
+}
+
+/* Протокол 10 трубок Дани */
+.mgTubesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.tubeCheckBtn {
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 17px;
+}
+
+.tubeCheckBtn.checked {
+  background: #14331e;
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+
+/* Ритуал Изгнания */
+.mgRelicsCircle {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 46px;
+  margin: 10px 0;
+  animation: pulse 1.2s infinite;
+}
+
+.mgBanishBtn {
+  width: 100%;
+  font-size: 26px;
+  padding: 14px;
+  margin-top: 8px;
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.9);
+}
+
+.strobeOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  pointer-events: none;
+  transition: opacity 0.06s;
+}
+
+/* --- КАЗНА ИМПЕРАТРИЦЫ --- */
+.treasuryBalanceBox {
+  background: #241909;
+  border: 3px solid var(--gold-bright);
+  padding: 12px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.treasuryBalanceLabel {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+.treasuryBalanceValue {
+  font-size: 42px;
+  color: var(--gold-bright);
+  text-shadow: 2px 2px 0 #000;
+}
+
+.treasurySubtext {
+  font-size: 17px;
+  color: var(--text-parchment);
+  margin-top: 4px;
+}
+
+.treasurySpendRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+/* --- БИБЛИОТЕКА ИЗ 29 ПЕРСОНАЖЕЙ --- */
+.charactersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex: 1;
+}
+
+.charGridCard {
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.charGridCard.unlocked {
+  border-color: var(--gold);
+}
+
+.charGridCard.unlocked:hover {
+  border-color: var(--gold-bright);
+  transform: translateY(-2px);
+}
+
+.charGridCard.locked {
+  opacity: 0.72;
+}
+
+.charGridPortraitWrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 6px;
+}
+
+.charGridImg {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--gold);
+  background: #140f07;
+  image-rendering: pixelated;
+}
+
+.charGridCard.locked .charGridImg {
+  filter: grayscale(0.85) brightness(0.55);
+}
+
+.charLockBadge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.charGridName {
+  font-size: 19px;
+  color: var(--gold-bright);
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+
+.charGridRole {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.15;
+}
+
+.charDetailHeaderRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #22180b;
+  border: 2px solid var(--gold);
+  padding: 10px;
+}
+
+.charDetailPortrait {
+  width: 96px;
+  height: 96px;
+  border: 3px solid var(--gold-bright);
+  background: #140f07;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.charDetailMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.charDetailRole {
+  font-size: 21px;
+  color: var(--gold-bright);
+}
+
+.charDetailStats {
+  font-size: 18px;
+  color: var(--text-parchment);
+}
+
+.charDetailUnlock {
+  font-size: 16px;
+  color: #2ecc71;
+}
+
+/* --- КВЕСТ-ЖУРНАЛ / ЛЕТОПИСЬ И ТУМБЛЕР GPS --- */
+.sealsContainer {
+  background: rgba(11, 8, 4, 0.6);
+  border: 2px solid var(--gold-dim);
+  padding: 8px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.sealsTitle {
+  font-size: 17px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.sealsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sealItem {
+  font-size: 17px;
+  padding: 4px 8px;
+  border: 2px solid var(--gold-dim);
+  background: #140f07;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sealItem.unlocked {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  background: #2b1f0e;
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
+}
+
+.cityTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.cityTab, .charTab {
+  flex: 1;
+  font-size: 18px;
+  padding: 6px 4px;
+}
+
+.cityTab.active, .charTab.active {
+  background: var(--gold);
+  color: #0b0804;
+  border-color: var(--gold-bright);
+  font-weight: bold;
+}
+
+.journalEntriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+  margin-bottom: 12px;
+}
+
+.journalEntry {
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 10px 12px;
+}
+
+.journalEntryTitle {
+  font-size: 20px;
+  color: var(--gold-bright);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.journalEntryText {
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--text-parchment);
+}
+
+.tonikQuote {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.45);
+  border-left: 3px solid var(--gold);
+  font-style: italic;
+  font-size: 18px;
+  color: #f7d884;
+}
+
+.journalEmpty {
+  text-align: center;
+  font-size: 19px;
+  color: var(--text-muted);
+  padding: 18px 8px;
+}
+
+.gpsToggleContainer {
+  background: #140f07;
+  border: 2px solid var(--gold-dim);
+  padding: 8px 10px;
+  margin-top: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.gpsToggleInfo {
+  font-size: 16px;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.journalFooterActions {
+  border-top: 2px dashed var(--gold-dim);
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* --- ОВЕРЛЕЙ ОФЛАЙНА --- */
+#offlineBanner {
+  position: fixed;
+  top: calc(64px + var(--safe-top));
+  left: 12px;
+  right: 12px;
+  z-index: 1000;
+  background: #331408;
+  border: 3px solid #ff9900;
+  box-shadow: var(--shadow-pixel);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.offlineIcon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: url('../img/portraits/tonik.svg') center/contain no-repeat;
+}
+
+.offlineText {
+  flex: 1;
+  font-size: 18px;
+  line-height: 1.2;
+  color: #ffebcc;
+}
+
+/* --- ФИНАЛЬНЫЙ ЭКРАН КОРОНАЦИИ --- */
+#finale {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  background: radial-gradient(circle at 50% 25%, #4a2c0a 0%, #0b0804 85%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 12px;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.confettiContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1301;
+}
+
+.confettiPiece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 18px;
+  opacity: 0.9;
+  animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); }
+  100% { transform: translateY(105vh) rotate(720deg); }
+}
+
+.finaleBox {
+  position: relative;
+  z-index: 1302;
+  width: min(620px, 96vw);
+  background: rgba(26, 20, 8, 0.96);
+  border: 5px solid var(--gold-bright);
+  box-shadow: var(--shadow-pixel-lg);
+  padding: 20px 16px;
+  margin: auto 0;
+}
+
+.finaleCrownIcon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.finaleTitle {
+  font-size: clamp(28px, 7.5vw, 44px);
+  color: var(--gold-bright);
+  text-shadow: 3px 3px 0 #000;
+  margin-bottom: 10px;
+}
+
+#finaleText {
+  font-size: 21px;
+  line-height: 1.3;
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+  color: var(--text-parchment);
+  background: rgba(0,0,0,0.45);
+  padding: 10px;
+  border: 2px dashed var(--gold);
+}
+
+.coronationToastsList {
+  max-height: 38vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  text-align: left;
+  padding-right: 4px;
+}
+
+.toastCard {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #22180b;
+  border: 2px solid var(--gold-dim);
+  padding: 8px 10px;
+}
+
+.toastPortrait {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--gold);
+  background: #140f07;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.toastSpeaker {
+  font-size: 19px;
+  color: var(--gold-bright);
+  margin-bottom: 2px;
+}
+
+.toastText {
+  font-size: 18px;
+  line-height: 1.22;
+  color: var(--text-parchment);
+}
+
+.finaleButtonsRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 440px) {
+  #dialogText {
+    padding-right: 84px;
+    font-size: 20px;
+  }
+  #portrait {
+    width: 78px;
+    height: 78px;
+  }
+  #dialogHeader {
+    padding-right: 88px;
+  }
+  .mgCardsRow {
+    grid-template-columns: 1fr;
+  }
+  .mgTubesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================================
+   СМЕННАЯ ТЕМА ДЕНЬ / НОЧЬ (Ночной поезд и дневные локации)
+   ============================================================================ */
+body.theme-day #map {
+  filter: sepia(0.24) saturate(0.88) contrast(1.03);
+  transition: filter 0.5s ease;
+}
+
+body.theme-night {
+  --bg-deep: #050814;
+  --bg-board: #0c1326;
+  --bg-board-light: #162240;
+}
+
+body.theme-night #map {
+  filter: invert(0.92) hue-rotate(188deg) saturate(0.78) brightness(0.75) contrast(1.15);
+  transition: filter 0.5s ease;
+}
+
+body.theme-night #hud {
+  background: rgba(9, 15, 32, 0.96);
+  border-bottom-color: #7986cb;
+  box-shadow: 0 3px 12px rgba(0, 15, 45, 0.85);
+}
+
+body.theme-night .targetCard {
+  background: rgba(11, 18, 38, 0.96);
+  border-color: #7986cb;
+}
+
+/* ============================================================================
+   ИНДИКАТОР ЗДОРОВЬЯ (РАНЕНИЕ С ДОРОГИ 14/18 HP И ИСЦЕЛЕНИЕ 18/18 HP)
+   ============================================================================ */
+.hpBadge.hpLow {
+  background: #5a1212;
+  color: #ffd6d6;
+  border-color: #ff5252;
+  box-shadow: 0 0 8px rgba(255, 82, 82, 0.65);
+}
+
+.hpBadge.hpDamaged {
+  animation: hpShake 0.4s ease-in-out 3;
+  background: #8b0000;
+  color: #fff;
+}
+
+.hpBadge.hpHealed {
+  background: #144527;
+  color: #a3f7bf;
+  border-color: #2ecc71;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
+}
+
+@keyframes hpShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Убираем ощущение двойной рамки у портретов персонажей */
+#portrait,
+.startHeroImg,
+.charGridImg,
+.charDetailPortrait,
+.toastPortrait {
+  border-width: 2px;
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+/* ============================================================================
+   ПИКСЕЛЬ-ГИФКА ТОНИКА В ЖИВЫХ КВЕСТАХ ОТ АКТЁРОВ
+   ============================================================================ */
+.tonikLiveQuestWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tonikGifBox {
+  background: linear-gradient(180deg, #10192b 0%, #1c1326 100%);
+  border: 3px solid var(--gold-bright);
+  box-shadow: var(--shadow-pixel);
+  padding: 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.tonikGifBadge {
+  display: inline-block;
+  background: rgba(0, 229, 255, 0.18);
+  border: 1px solid #00e5ff;
+  color: #76ffff;
+  font-size: 15px;
+  padding: 2px 8px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.tonikGifStage {
+  height: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: radial-gradient(circle, rgba(245, 207, 71, 0.14) 0%, rgba(0, 0, 0, 0.45) 75%);
+  border: 2px dashed rgba(212, 175, 55, 0.45);
+  margin-bottom: 8px;
+}
+
+.tonikSpriteWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tonikGifAvatar {
+  width: 68px;
+  height: 68px;
+  image-rendering: pixelated;
+  border: none !important;
+  background: transparent !important;
+  filter: drop-shadow(2px 3px 0 #000);
+}
+
+.tonikPropLeft,
+.tonikPropRight {
+  font-size: 32px;
+  display: inline-block;
+  animation: propFloat 0.9s infinite ease-in-out alternate;
+}
+
+.tonikPropRight {
+  animation-delay: 0.35s;
+}
+
+.tonikParticles {
+  font-size: 18px;
+  letter-spacing: 6px;
+  margin-top: 4px;
+  animation: pulse 1s infinite;
+}
+
+.tonikGifCaption {
+  font-size: 19px;
+  line-height: 1.25;
+  color: #f7e6b5;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 8px 10px;
+  border-left: 3px solid var(--gold-bright);
+  text-align: left;
+}
+
+@keyframes propFloat {
+  0% { transform: translateY(-4px) rotate(-10deg); }
+  100% { transform: translateY(5px) rotate(12deg); }
+}
+
+.anim-lute-spin .tonikGifAvatar {
+  animation: tonikWobble 0.7s infinite ease-in-out alternate;
+}
+.anim-herb-sneeze .tonikGifAvatar {
+  animation: tonikSneeze 1.1s infinite ease-in-out;
+}
+.anim-cheese-lift .tonikGifAvatar {
+  animation: tonikLift 0.85s infinite ease-in-out alternate;
+}
+.anim-potion-puff .tonikGifAvatar {
+  animation: tonikPuff 0.65s infinite ease-in-out alternate;
+}
+.anim-granite-strain .tonikGifAvatar {
+  animation: tonikStrain 0.45s infinite ease-in-out alternate;
+}
+.anim-hunter-bow .tonikGifAvatar {
+  animation: tonikBowJump 0.95s infinite ease-in-out;
+}
+
+@keyframes tonikWobble {
+  0% { transform: rotate(-14deg) translateY(0); }
+  100% { transform: rotate(14deg) translateY(-6px); }
+}
+@keyframes tonikSneeze {
+  0%, 60% { transform: scale(1) translateY(0); }
+  75% { transform: scale(1.18, 0.85) translateY(-8px) rotate(-8deg); }
+  100% { transform: scale(1) translateY(0); }
+}
+@keyframes tonikLift {
+  0% { transform: translateY(4px) scaleY(0.9); }
+  100% { transform: translateY(-6px) scaleY(1.06); }
+}
+@keyframes tonikPuff {
+  0% { transform: scale(0.95) rotate(-6deg); filter: hue-rotate(0deg); }
+  100% { transform: scale(1.08) rotate(6deg); filter: hue-rotate(45deg); }
+}
+@keyframes tonikStrain {
+  0% { transform: translateX(-3px) scale(1.04, 0.94); }
+  100% { transform: translateX(3px) scale(0.96, 1.05); }
+}
+@keyframes tonikBowJump {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(12px) translateY(-10px) rotate(12deg); }
+}
+
+/* ============================================================================
+   ПЕРЕДЕЛАННАЯ ЛЕТОПИСЬ: 3 ГЛАВНЫЕ ВКЛАДКИ И АРХИВ ИСТОРИИ ДИАЛОГОВ
+   ============================================================================ */
+.journalMainTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.journalSectionTab {
+  flex: 1;
+  font-size: 18px;
+  padding: 7px 8px;
+  white-space: nowrap;
+}
+
+.journalSectionTab.active {
+  background: var(--gold);
+  color: #0b0804;
+  border-color: var(--gold-bright);
+  font-weight: bold;
+}
+
+.journalTabPane {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.dialogHistoryHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.dialogChapterSelect {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  background: #140f07;
+  color: var(--gold-bright);
+  border: 2px solid var(--gold);
+  padding: 6px 10px;
+  outline: none;
+}
+
+.dialogHistoryScroll {
+  max-height: none;
+}
+
+.dialogTranscriptBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dialogTranscriptSection {
+  padding: 8px 10px;
+  border-left: 3px solid var(--gold);
+  background: rgba(0, 0, 0, 0.38);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dialogTranscriptSection.transcript-digital {
+  border-left-color: #00e5ff;
+  background: rgba(6, 20, 36, 0.55);
+}
+
+.dialogTranscriptSection.transcript-live {
+  border-left-color: var(--gold-bright);
+  background: rgba(36, 24, 9, 0.55);
+}
+
+.dialogTranscriptSection.transcript-branch {
+  border-left-color: #2ecc71;
+  background: rgba(14, 34, 20, 0.5);
+}
+
+.dialogTranscriptBadge {
+  font-size: 15px;
+  color: var(--gold-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.35);
+  padding-bottom: 2px;
+}
+
+.dialogTranscriptSection.transcript-digital .dialogTranscriptBadge {
+  color: #76ffff;
+}
+
+.dialogTranscriptLine {
+  font-size: 18px;
+  line-height: 1.26;
+  color: var(--text-parchment);
+}
+
+/* --- ПОЛНОЭКРАННЫЙ РУБЕЖ ДНЕЙ И РЕЖИМ СНА ДО УТРА (#dayBreakModal) --- */
+#dayBreakModal {
+  position: fixed;
+  inset: 0;
+  z-index: 3800;
+  background: radial-gradient(circle at 50% 25%, rgba(22, 34, 68, 0.96) 0%, rgba(5, 8, 18, 0.99) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.dayBreakCard {
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #0c1428 0%, #070b16 100%);
+  border: 3px solid #7986cb;
+  box-shadow: 0 0 0 3px #050811, 0 0 35px rgba(121, 134, 203, 0.45);
+  padding: 18px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dayBreakBadge {
+  display: inline-block;
+  align-self: center;
+  background: #1a237e;
+  color: #e8eaf6;
+  border: 2px solid #9fa8da;
+  padding: 4px 12px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dayBreakTitle {
+  font-size: 28px;
+  color: #ffd54f;
+  margin: 2px 0;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.dayBreakStage {
+  background: rgba(15, 23, 46, 0.85);
+  border: 2px dashed #5c6bc0;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.dayBreakTonikWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dayBreakTonikImg {
+  width: 88px;
+  height: 88px;
+  border: 3px solid #9fa8da;
+  background: #101830;
+  padding: 4px;
+  animation: sleepBreathe 3s ease-in-out infinite;
+}
+
+.dayBreakZzz {
+  position: absolute;
+  top: -12px;
+  right: -46px;
+  font-size: 22px;
+  animation: floatZzz 2.4s ease-in-out infinite;
+}
+
+@keyframes sleepBreathe {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50% { transform: scale(1.06) rotate(2deg); }
+}
+
+@keyframes floatZzz {
+  0%, 100% { transform: translateY(0) scale(0.95); opacity: 0.75; }
+  50% { transform: translateY(-8px) scale(1.1); opacity: 1; }
+}
+
+.dayBreakQuote {
+  font-size: 19px;
+  color: #c5cae9;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+.dayBreakBody {
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px solid rgba(212, 175, 55, 0.45);
+  padding: 12px 14px;
+  font-size: 20px;
+  line-height: 1.32;
+  color: var(--text-parchment);
+  text-align: left;
+}
+
+.dayBreakWakeBtn {
+  width: 100%;
+  font-size: 22px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #ffd54f 0%, #f59e0b 100%);
+  color: #0b0804;
+  border-color: #fff8e1;
+  font-weight: bold;
+  box-shadow: 0 0 18px rgba(255, 213, 79, 0.5);
+}
+
+/* --- ЭКРАН ИСТОЩЕНИЯ И МАФИОЗНОЙ РЕАНИМАЦИИ ТОНИКА (#defeatModal) --- */
+#defeatModal {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  background: radial-gradient(circle at 50% 25%, rgba(68, 12, 12, 0.98) 0%, rgba(12, 3, 3, 0.99) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: grayscale(80%) blur(3px);
+}
+
+.defeatCard {
+  width: 100%;
+  max-width: 540px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #240a0a 0%, #120404 100%);
+  border: 3px solid #e74c3c;
+  box-shadow: 0 0 0 3px #3d0707, 0 0 45px rgba(231, 76, 60, 0.6);
+  padding: 18px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: defeatPulse 3s infinite ease-in-out;
+}
+
+@keyframes defeatPulse {
+  0%, 100% { border-color: #e74c3c; box-shadow: 0 0 35px rgba(231, 76, 60, 0.5); }
+  50% { border-color: #ff7675; box-shadow: 0 0 50px rgba(255, 118, 117, 0.8); }
+}
+
+.defeatBadge {
+  display: inline-block;
+  align-self: center;
+  background: #c0392b;
+  color: #fff;
+  border: 2px solid #ff7675;
+  padding: 4px 12px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.defeatTitle {
+  font-size: 26px;
+  color: #ff7675;
+  margin: 2px 0;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.defeatStage {
+  background: rgba(30, 8, 8, 0.85);
+  border: 2px dashed rgba(231, 76, 60, 0.55);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.defeatTonikWrap {
+  position: relative;
+  width: 86px;
+  height: 86px;
+}
+
+.defeatTonikImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(231, 76, 60, 0.6));
+  animation: tonikPanic 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes tonikPanic {
+  0% { transform: scale(1) rotate(-8deg); }
+  100% { transform: scale(1.12) rotate(8deg); }
+}
+
+.defeatSirens {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  white-space: nowrap;
+  animation: floatZzz 1.2s infinite ease-in-out;
+}
+
+.defeatQuote {
+  font-size: 19px;
+  color: #ffcccc;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+.defeatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.defeatLootPenalty {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(243, 156, 18, 0.55);
+  padding: 10px 12px;
+  font-size: 18px;
+  line-height: 1.3;
+  color: #ffeaa7;
+  text-align: left;
+}
+
+.defeatTaskBox {
+  background: rgba(44, 10, 10, 0.7);
+  border: 2px solid #e74c3c;
+  padding: 12px;
+  text-align: left;
+}
+
+.defeatTaskHeader {
+  font-size: 16px;
+  color: #ff7675;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.defeatTaskText {
+  font-size: 20px;
+  line-height: 1.34;
+  color: #ffffff;
+}
+
+.defeatReviveBtn {
+  width: 100%;
+  font-size: 22px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  color: #ffffff;
+  border-color: #ff7675;
+  font-weight: bold;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+  cursor: pointer;
+}

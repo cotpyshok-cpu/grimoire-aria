@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1408">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Гримуар Арии — Хроники Хондора (Акты I–III)</title>
+  
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="img/portraits/tonik.svg">
+  <link rel="apple-touch-icon" href="img/portraits/tonik.svg">
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body class="theme-day">
+
+  <!-- 1. СТАРТОВЫЙ ЭКРАН -->
+  <div id="startScreen">
+    <div class="startBox">
+      <div class="startPortraitsRow">
+        <img src="img/portraits/aria.svg" alt="Ария" class="startHeroImg">
+        <img src="img/portraits/tonik.svg" alt="Тоник" class="startHeroImg">
+        <img src="img/portraits/melari.svg" alt="Мелари" class="startHeroImg">
+        <img src="img/portraits/linar.svg" alt="Линар" class="startHeroImg">
+        <img src="img/portraits/orivia.svg" alt="Оривия" class="startHeroImg">
+      </div>
+      <h1>ГРИМУАР АРИИ</h1>
+      <p class="subtitle">Хроники Хондора • Акты I–III (Астана → Ночной Поезд → Караганда)</p>
+      
+      <div class="lorePrologue">
+        В финале прошлой кампании жестокий город <strong>Хондор</strong> был разрушен, а трагические души влюблённых <strong>Человека и Эльфа</strong> (Два Духа Безликих) были воссоединены в посмертии. Ты — <strong>Ария</strong>, народная героиня и фея Прорицания, живущая в лесном святилище вместе с друидкой <strong>Линар</strong> прямо здесь, в <strong>Астане</strong>.<br><br>
+        <strong>Великий Архивариус Ильярион</strong> (Архфей Звёздного Света) воскресил и впаял в кристалл этого Гримуара мышь <strong>Тоника</strong> — правда, от шока Тоник забыл, как вы бросили его на съедение воронам (и как под пение <strong>Мелари и Оривии</strong> в подвале церкви его хоронила <strong>мышиная мафия</strong> под музыку из <em>«Крёстного Отца»</em>!). Собери отряд в Астане, отправься ночным поездом в Караганду, добудь 3 Родовые Печати и Ключ, возроди разрушенный Хондор для нелюдей и стань <strong>Королевой Леса</strong>!
+      </div>
+
+      <div class="startActions">
+        <button id="resumeBtn" class="pixelBtn hidden">⚔ ПРОДОЛЖИТЬ ПРИКЛЮЧЕНИЕ ⚔</button>
+        <button id="startBtn" class="pixelBtn">⚔ ПРОБУДИТЬ ГРИМУАР ⚔</button>
+        <button id="resetStartBtn" class="pixelBtn secondary hidden">Сбросить сохранение</button>
+      </div>
+
+      <p class="startHint">Нажми для пробуждения кристалла Гримуара и лютни барда</p>
+    </div>
+  </div>
+
+  <!-- 2. КАРТА LEAFLET -->
+  <div id="map"></div>
+
+  <!-- 3. ВЕРХНЯЯ ПАНЕЛЬ (HUD) -->
+  <div id="hud">
+    <div class="hudLeft">
+      <div class="hudTitleRow">
+        <span id="questTitle">Гримуар Арии</span>
+        <span id="hpBadge" class="hpBadge" title="Здоровье Арии">❤️ 18/18</span>
+      </div>
+      <div id="cityIndicator">Акт I: Астана (Глава 1/16)</div>
+    </div>
+    
+    <div class="hudRight">
+      <button id="treasuryBtn" class="hudBtn goldBtn" title="Казна Героини Леса">
+        🪙 <span id="goldCount">0</span>
+      </button>
+      <button id="charsBtn" class="hudBtn" title="Библиотека Персонажей (29 героев)">
+        👥 <span id="charsCount">2/29</span>
+        <span id="charsBadge" class="badge hidden">!</span>
+      </button>
+      <button id="journalBtn" class="hudBtn" title="Летопись, История Диалогов и Лор Хондора">
+        📖 Летопись
+        <span id="journalBadge" class="badge hidden">!</span>
+      </button>
+      <button id="themeToggleBtn" class="hudBtn" title="Переключить тему День / Ночь">☀️ День</button>
+      <button id="cityToggleBtn" class="hudBtn" title="Переключить карту Акта">🗺 Акт</button>
+      <button id="muteBtn" class="hudBtn" title="Звук">🔊</button>
+    </div>
+  </div>
+
+  <!-- 4. ПЛАВАЮЩИЙ ТРЕКЕР ЦЕЛИ (внизу экрана карты) -->
+  <div id="targetTracker">
+    <div class="targetCard">
+      <div class="targetInfo">
+        <div id="targetActLabel" class="targetLabel">Акт I: Сейчас мы в Астане • Текущая глава (1 / 16):</div>
+        <div id="targetName" class="targetName">Глава 1. Лесное Святилище в Астане: Пробуждение Тоника</div>
+        <div id="targetDist" class="targetDistance">📍 Режим свободного теста (жми «⚡ Я на месте»)</div>
+      </div>
+      <div class="targetActions">
+        <button id="manualOpenBtn" class="pixelBtn manualOpenBtn" title="Открыть сцену и испытание текущей главы">
+          ⚡ Я на месте
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ДИАЛОГОВОЕ ОКНО (Typewriter + Индикатор Эфир Гримуара / Живая Сцена) -->
+  <div id="dialogBox" class="hidden mode-digital">
+    <div id="dialogModeBanner" class="dialogModeBanner">📱 ЭФИР ГРИМУАРА • СВЯЗЬ С ТОНИКОМ</div>
+    <div id="dialogHeader">
+      <div id="dialogName">🐀 Тоник</div>
+    </div>
+    <div id="portrait"></div>
+    <div id="dialogText"></div>
+    <div id="dialogNext">▼ далее</div>
+  </div>
+
+  <!-- 5.1 КАРТОЧКА ПЕРЕХОДА МЕЖДУ ТОНИКОМ (В ПУТИ) И ЖИВОЙ СЦЕНОЙ (НА МЕСТЕ) -->
+  <div id="sceneTransitionModal" class="hidden">
+    <div class="transitionCard">
+      <div id="transitionBadge" class="transitionBadge">🚪 ПЕРЕХОД К РЕАЛЬНОЙ СЦЕНЕ</div>
+      <h2 id="transitionTitle" class="transitionTitle">Салон Мелари</h2>
+      <div id="transitionText" class="transitionText"></div>
+      <button id="transitionContinueBtn" class="pixelBtn transitionBtn">🚪 Войти и начать живую сцену ▶</button>
+    </div>
+  </div>
+
+  <!-- 5.2 ПОЛНОЭКРАННЫЙ РУБЕЖ МЕЖДУ ДНЯМИ / РЕЖИМ НОЧНОГО СНА ДО УТРА -->
+  <div id="dayBreakModal" class="hidden">
+    <div class="dayBreakCard">
+      <div id="dayBreakBadge" class="dayBreakBadge">🌙 РУБЕЖ ДНЕЙ • НОЧНОЙ ОТБОЙ ДО УТРА</div>
+      <h2 id="dayBreakTitle" class="dayBreakTitle">ПЕРВЫЙ ДЕНЬ ЗАВЕРШЁН — ВРЕМЯ СПАТЬ!</h2>
+      <div class="dayBreakStage">
+        <div class="dayBreakTonikWrap">
+          <img src="img/portraits/tonik.svg" alt="Тоник спит" class="dayBreakTonikImg">
+          <div id="dayBreakZzz" class="dayBreakZzz">💤 🌙 ⭐ 🧀</div>
+        </div>
+        <div id="dayBreakQuote" class="dayBreakQuote">
+          🐀 Тоник свернулся калачиком под уголком платка: «Хр-р-р... пф-ф-ф... маасдам... воронам вход воспрещён... Ария спит до самого утра!»
+        </div>
+      </div>
+      <div id="dayBreakBody" class="dayBreakBody"></div>
+      <button id="dayBreakWakeBtn" class="pixelBtn dayBreakWakeBtn">☀️ ДОБРОЕ УТРО! ПРОСНУТЬСЯ И НАЧАТЬ ДЕНЬ 2 ▶</button>
+    </div>
+  </div>
+
+  <!-- 5.3 ЭКРАН ИСТОЩЕНИЯ И МАФИОЗНОЙ РЕАНИМАЦИИ ТОНИКА (0 HP) -->
+  <div id="defeatModal" class="hidden">
+    <div class="defeatCard">
+      <div class="defeatBadge">⚠️ ФЕЙСКИЙ ОБМОРОК • КРЫЛЬЯ ПОГАСЛИ</div>
+      <h2 class="defeatTitle">0 / 18 HP — АСТРАЛЬНОЕ ИСТОЩЕНИЕ!</h2>
+      <div class="defeatStage">
+        <div class="defeatTonikWrap">
+          <img src="img/portraits/tonik.svg" alt="Тоник в панике" class="defeatTonikImg">
+          <div class="defeatSirens">🚨 ⚡ 🧀 ⚡ 🚨</div>
+        </div>
+        <div id="defeatPanicQuote" class="defeatQuote">
+          🐀 Тоник мечется в панике, сбивая шляпу: «А-А-А! АРИЯ! КРЫЛЬЯ ПОГАСЛИ! Пульс на нуле! Она рухнула в фейский обморок! Во всём виноваты мои укусы за палец! Мы теряем будущую Королеву Леса!»
+        </div>
+      </div>
+
+      <div class="defeatBody">
+        <div class="defeatLootPenalty">
+          <strong>🧀 Экстренный Протокол Мышиной Мафии:</strong><br>
+          Тоник достаёт из подкладки шляпы контрабандный шприц с сырной сывороткой бодрости.<br>
+          <em>«Я верну тебе <strong>+6 ❤️ HP</strong>, но по закону Мафии Хондора за реанимацию положена дань: <strong>−500 ЗМ</strong> из Казны + искупительный фант!»</em>
+        </div>
+
+        <div class="defeatTaskBox">
+          <div class="defeatTaskHeader">📜 ИСКУПИТЕЛЬНЫЙ ЖИВОЙ ФАНТ ДЛЯ СПУТНИКОВ:</div>
+          <div id="defeatTaskText" class="defeatTaskText">
+            Сделай глоток чая/воды из рук спутника и громко произнеси: <strong>«Тоник — величайший сырный мафиози всех девяти миров!»</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="defeatActions">
+        <button id="defeatReviveBtn" class="pixelBtn defeatReviveBtn">💉 [Фант выполнен]: Заплатить 500 ЗМ и ожить (+6 ❤️ HP) ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. МОДАЛЬНОЕ ОКНО МИНИ-ИГР, БОЕВ И РУННЫХ ШИФРОВ -->
+  <div id="minigameModal" class="hidden">
+    <div class="minigameCard">
+      <div class="riddleHeader">
+        <div id="minigameTitle" class="riddleTitle">⚔ Испытание Гримуара</div>
+        <button id="minigameCloseBtn" class="smallBtn" title="Свернуть к карте">✖</button>
+      </div>
+      <div id="minigameBody" class="minigameBody"></div>
+    </div>
+  </div>
+
+  <!-- 7. МОДАЛЬНОЕ ОКНО КАЗНЫ ГЕРОИНИ ЛЕСА -->
+  <div id="treasuryModal" class="hidden">
+    <div class="journalCard">
+      <div class="journalHeader">
+        <h2>🪙 КАЗНА ГЕРОИНИ ЛЕСА</h2>
+        <button id="treasuryCloseBtn" class="smallBtn">✖</button>
+      </div>
+      <div class="treasuryBalanceBox">
+        <div class="treasuryBalanceLabel">Текущий золотой баланс:</div>
+        <div class="treasuryBalanceValue"><span id="treasuryModalGold">0</span> ЗМ</div>
+        <div class="treasurySubtext">🐀 Тоник: «Золото, спасенное из сокровищниц Хондора на возрождение города для нелюдей!»</div>
+      </div>
+      <div class="treasurySpendBox">
+        <div class="sealsTitle">Обналичить золото у Великого Архивариуса Ильяриона (на кофе и угощения):</div>
+        <div class="treasurySpendRow">
+          <button class="pixelBtn spendPresetBtn" data-amount="1000">☕ Списать 1000 ЗМ (Утренний Раф)</button>
+          <button class="pixelBtn spendPresetBtn" data-amount="1500">🥐 Списать 1500 ЗМ (Латте и круассан)</button>
+        </div>
+        <div id="treasuryMsg" class="mgFeedback hidden"></div>
+      </div>
+      <div class="sealsTitle" style="margin-top:10px;">История операций Казны:</div>
+      <div id="treasuryHistoryList" class="journalEntriesList"></div>
+    </div>
+  </div>
+
+  <!-- 8. ЭКРАН БИБЛИОТЕКИ ПЕРСОНАЖЕЙ (29 ГЕРОЕВ) -->
+  <div id="charactersModal" class="hidden">
+    <div class="journalCard">
+      <div class="journalHeader">
+        <h2>👥 БИБЛИОТЕКА ГЕРОЕВ ХОНДОРА (<span id="charsModalCounter">2/29</span>)</h2>
+        <button id="charsCloseBtn" class="smallBtn">✖</button>
+      </div>
+
+      <div class="cityTabs">
+        <button class="smallBtn charTab active" data-sec="all">Все (29)</button>
+        <button class="smallBtn charTab" data-sec="1">I. Отряд (6)</button>
+        <button class="smallBtn charTab" data-sec="2">II. Духи (12)</button>
+        <button class="smallBtn charTab" data-sec="3">III. Кланы (11)</button>
+      </div>
+
+      <div id="charactersGrid" class="charactersGrid"></div>
+    </div>
+  </div>
+
+  <!-- 8.1 МОДАЛЬНОЕ ДОСЬЕ КОНКРЕТНОГО ПЕРСОНАЖА -->
+  <div id="characterDetailModal" class="hidden">
+    <div class="journalCard charDetailCard">
+      <div class="journalHeader">
+        <h2 id="charDetailName">Герой</h2>
+        <button id="charDetailCloseBtn" class="smallBtn">✖ Назад</button>
+      </div>
+      <div id="charDetailBody" class="charDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- 9. ЭКРАН КВЕСТ-ЖУРНАЛА (ЛЕТОПИСЬ ПУТИ + ИСТОРИЯ ДИАЛОГОВ + ЛОР ХОНДОРА) -->
+  <div id="journalModal" class="hidden">
+    <div class="journalCard">
+      <div class="journalHeader">
+        <h2>📖 ЛЕТОПИСЬ ГРИМУАРА</h2>
+        <button id="journalCloseBtn" class="smallBtn">✖</button>
+      </div>
+
+      <!-- Главные вкладки переделанной Летописи -->
+      <div class="journalMainTabs">
+        <button class="pixelBtn journalSectionTab active" data-jtab="chronicle">📜 Хроника Пути</button>
+        <button class="pixelBtn secondary journalSectionTab" data-jtab="dialogs">💬 История Диалогов</button>
+        <button class="pixelBtn secondary journalSectionTab" data-jtab="lore">🏛 Лор Хондора</button>
+      </div>
+
+      <!-- СЕКЦИЯ 1: ХРОНИКА ПУТИ И РЕЛИКВИИ -->
+      <div id="journalTabChronicle" class="journalTabPane">
+        <div class="sealsContainer">
+          <div class="sealsTitle">4 Главные Реликвии Возрождения Хондора:</div>
+          <div id="sealsList" class="sealsList"></div>
+        </div>
+
+        <div class="sealsContainer">
+          <div class="sealsTitle">Собранные артефакты и благословения:</div>
+          <div id="artifactsList" class="sealsList"></div>
+        </div>
+
+        <div class="cityTabs">
+          <button class="smallBtn cityTab active" data-city="all">Все (16)</button>
+          <button class="smallBtn cityTab" data-city="ast">Акт I: Астана</button>
+          <button class="smallBtn cityTab" data-city="train">Акт II: Ночной Поезд</button>
+          <button class="smallBtn cityTab" data-city="kar">Акт III: Караганда</button>
+        </div>
+
+        <div id="journalEntriesList" class="journalEntriesList"></div>
+      </div>
+
+      <!-- СЕКЦИЯ 2: ИСТОРИЯ ДИАЛОГОВ И СЦЕН -->
+      <div id="journalTabDialogs" class="journalTabPane hidden">
+        <div class="dialogHistoryHeader">
+          <div class="sealsTitle">Полный архив диалогов с Тоником и живыми героями по главам:</div>
+          <select id="dialogChapterFilter" class="dialogChapterSelect">
+            <option value="all">Все открытые главы</option>
+          </select>
+        </div>
+        <div id="dialogHistoryList" class="journalEntriesList dialogHistoryScroll"></div>
+      </div>
+
+      <!-- СЕКЦИЯ 3: ИСТИННЫЙ ЛОР ХОНДОРА -->
+      <div id="journalTabLore" class="journalTabPane hidden">
+        <div class="sealsTitle" style="margin-bottom:8px;">Тайные архивы Великого Архивариуса Ильяриона о прошлом Хондора:</div>
+        <div id="loreArticlesList" class="journalEntriesList"></div>
+      </div>
+
+      <!-- Переключатель привязки к GPS -->
+      <div class="gpsToggleContainer">
+        <div class="gpsToggleInfo">
+          <strong>🛰 Проверка координат GPS:</strong>
+          <span id="gpsModeText">ВЫКЛ (Свободный тест — любая точка открывается кнопкой «⚡ Я на месте»)</span>
+        </div>
+        <button id="gpsToggleBtn" class="smallBtn">Включить строгий GPS</button>
+      </div>
+
+      <!-- Нижняя плашка управления -->
+      <div class="journalFooterActions">
+        <button id="recenterMapBtn" class="smallBtn">🗺 Показать текущую цель</button>
+        <button id="resetProgressBtn" class="smallBtn danger">Сброс прогресса</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. ОВЕРЛЕЙ ПРЕДУПРЕЖДЕНИЯ ОБ ОФЛАЙНЕ -->
+  <div id="offlineBanner" class="hidden">
+    <div class="offlineIcon"></div>
+    <div class="offlineText">
+      <strong>Сигнал Гримуара слаб!</strong><br>
+      Тоник шепчет: книга и прогресс надежно сохранены в памяти кристалла!
+    </div>
+    <button id="offlineCloseBtn" class="smallBtn">OK</button>
+  </div>
+
+  <!-- 11. ФИНАЛЬНЫЙ ЭКРАН КОРОНАЦИИ КОРОЛЕВЫ ЛЕСА -->
+  <div id="finale" class="hidden">
+    <div id="confettiContainer" class="confettiContainer"></div>
+    <div class="finaleBox">
+      <div class="finaleCrownIcon">👑</div>
+      <h1 class="finaleTitle">С ДНЁМ РОЖДЕНИЯ, КОРОЛЕВА ЛЕСА АРИЯ!</h1>
+      <div id="finaleText"></div>
+      <div class="sealsTitle" style="margin: 12px 0 8px; text-align:left;">🎉 Поздравления от твоей Гильдии и Семьи (15 героев):</div>
+      <div id="coronationToastsList" class="coronationToastsList"></div>
+      <div class="finaleButtonsRow">
+        <button id="finaleCharsBtn" class="pixelBtn">👥 Вся Библиотека (29/29)</button>
+        <button id="finaleJournalBtn" class="pixelBtn secondary">📖 Летопись Пути</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Фоновое аудио -->
+  <audio id="bgMusic" loop preload="none"></audio>
+
+  <!-- Скрипты -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/dialog.js"></script>
+  <script src="js/matcher.js"></script>
+  <script src="js/quest.js"></script>
+  <script src="js/minigames.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Регистрация Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+          console.warn('SW registration failed:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

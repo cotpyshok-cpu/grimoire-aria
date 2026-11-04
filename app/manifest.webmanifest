@@ -1,0 +1,19 @@
+{
+  "name": "Гримуар Арии — Городской квест D&D",
+  "short_name": "Гримуар Арии",
+  "description": "Городской квест-приключение в стилистике D&D ко дню рождения",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0804",
+  "theme_color": "#1a1408",
+  "icons": [
+    {
+      "src": "img/portraits/tonik.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
