@@ -16,7 +16,7 @@ const App = (() => {
     artifacts: [],
     dialogHistory: [], // Записанные реплики по главам
     themeMode: 'day', // 'day' | 'night'
-    strictGps: false, // По умолчанию ВЫКЛ (свободный тест), переключается в Летописи
+    strictGps: true, // По умолчанию ВКЛ (строгий GPS режим), переключается в Летописи
     selectedCity: 'all', // 'all' | 'ast' | 'train' | 'kar'
     playerCoords: null,
     hasUnreadJournal: false,
@@ -57,7 +57,7 @@ const App = (() => {
           state.artifacts = Array.isArray(saved.artifacts) ? saved.artifacts : [];
           state.dialogHistory = Array.isArray(saved.dialogHistory) ? saved.dialogHistory : [];
           state.themeMode = saved.themeMode || 'day';
-          state.strictGps = !!saved.strictGps;
+          state.strictGps = saved.strictGps !== undefined ? !!saved.strictGps : true;
           state.selectedCity = saved.selectedCity || 'all';
           state.pendingDayBreakLocId = saved.pendingDayBreakLocId || null;
         }
@@ -1467,6 +1467,7 @@ const App = (() => {
     state.selectedCity = 'all';
     state.hasUnreadJournal = false;
     state.hasUnreadChars = false;
+    state.strictGps = true;
     state.pendingDayBreakLocId = null;
     const dbModal = document.getElementById('dayBreakModal');
     if (dbModal) dbModal.classList.add('hidden');
