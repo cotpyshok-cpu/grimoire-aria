@@ -15,3 +15,8 @@ npm-debug.log*
 # IDE & system
 .vscode/
 .idea/
+
+# Internal AI / Prompt notes
+ANTIGRAVITY_PROMPT.md
+IMPLEMENTATION_PLAN_V3.md
+PROJECT_MEMO.md
