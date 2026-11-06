@@ -1,5 +1,5 @@
 // Service Worker для Гримуара Арии (Хроники Хондора — полная офлайн-работа всех 3 актов и 29 портретов)
-const CACHE_NAME = 'grimoire-aria-v14';
+const CACHE_NAME = 'grimoire-aria-v15';
 const ASSETS = [
   './',
   './index.html',
