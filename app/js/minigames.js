@@ -226,6 +226,9 @@ const Minigames = (() => {
       case 'hunters_alley':
         renderHuntersAlley(loc, callbacks);
         break;
+      case 'bowling_cheese':
+        renderBowlingCheese(loc, callbacks);
+        break;
       case 'final_altar':
         renderFinalAltar(loc, callbacks);
         break;
@@ -1195,7 +1198,7 @@ const Minigames = (() => {
       bodyEl.innerHTML = '';
       renderTonikLiveQuestCard(bodyEl, {
         title: 'Экзамен Трёх Добродетелей Великого Архивариуса',
-        subtitle: 'Каменный ларчик Горгульи открыт, но на нём сияет звёздная печать Архфея! Великий Архивариус Ильярион лично испытывает Арию тремя добродетелями: Интуицией (Расколотая Звезда), Мудростью (Каверзный Суд) и Сердцем (Клятва и Подарок):',
+        subtitle: 'Каменный ларчик Горгульи открыт, но на нём сияет звёздная печать Архфея! Великий Архивариус Ильярион лично испытывает Арию тремя добродетелями: Интуицией (Расколотая Звезда), Мудростью (Каверзный Суд) и Сердцем (Клятва и Подарок Кубиков D20):',
         actorGenitive: 'Великого Архивариуса Ильяриона',
         animClass: 'anim-granite-strain',
         propLeft: '📜',
@@ -1321,14 +1324,130 @@ const Minigames = (() => {
     renderStage1();
   }
 
+  
   // ---------------------------------------------------------------------------
-  // 16. АЛТАРЬ ВОЗРОЖДЕНИЯ ХОНДОРА И КОРОЛЕВА ЛЕСА (Финал Акта III)
+  // 15. КЕГЕЛЬБАН ДРЕВНИХ: БОУЛИНГ И ЗАПУСК ТОНИКА В СЫР (Глава 15)
+  // ---------------------------------------------------------------------------
+  function renderBowlingCheese(loc, callbacks) {
+    bodyEl.innerHTML = `
+      <div class="mgDescription combatAlert">
+        <strong>🎳 КЕГЕЛЬБАН ДРЕВНИХ — ЗАПУСК ТОНИКА В СЫР!</strong><br>
+        Безликий заколдовал кегли в «Теневых Исполинов», но они сделаны из гигантских головок королевского пармезана! Тоник свернулся в пушистый шар и жаждет протаранить кегли!<br>
+        Нажми <strong>«ЗАПУСТИТЬ ТОНИКА В СЫР!»</strong>, чтобы выбить страйк, получить победный шифр и перейти к живой игре в боулинг!
+      </div>
+
+      <div class="bowlingArena" style="position:relative; background:radial-gradient(ellipse at center, #2e1065 0%, #0f0728 100%); border:2px solid var(--gold-bright); border-radius:12px; padding:16px; margin:14px 0; overflow:hidden; text-align:center; min-height:260px;">
+        <!-- Сырные кегли -->
+        <div id="cheesePinsRow" style="display:flex; justify-content:center; gap:12px; margin-bottom:20px; transition:all 0.5s ease;">
+          <div class="cheesePin" style="font-size:36px; transition:transform 0.4s ease, opacity 0.4s ease; display:inline-block;">🧀</div>
+          <div class="cheesePin" style="font-size:36px; transition:transform 0.4s ease, opacity 0.4s ease; display:inline-block;">🧀</div>
+          <div class="cheesePin" style="font-size:36px; transition:transform 0.4s ease, opacity 0.4s ease; display:inline-block;">🧀</div>
+          <div class="cheesePin" style="font-size:36px; transition:transform 0.4s ease, opacity 0.4s ease; display:inline-block;">🧀</div>
+          <div class="cheesePin" style="font-size:36px; transition:transform 0.4s ease, opacity 0.4s ease; display:inline-block;">🧀</div>
+        </div>
+
+        <!-- Дорожка -->
+        <div style="height:70px; border-left:2px dashed rgba(255,215,0,0.3); border-right:2px dashed rgba(255,215,0,0.3); width:180px; margin:0 auto; position:relative;">
+          <div id="rollingTonik" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); font-size:42px; transition:all 0.6s cubic-bezier(0.25, 1, 0.5, 1);">
+            🐀💨
+          </div>
+        </div>
+
+        <!-- Кнопка запуска -->
+        <div style="margin-top:16px;">
+          <button id="launchTonikBtn" class="pixelBtn primary" style="font-size:16px; padding:12px 20px; cursor:pointer;">
+            🎯 ЗАПУСТИТЬ ТОНИКА В СЫР! 🧀
+          </button>
+        </div>
+      </div>
+
+      <div id="bowlingSuccessSection" class="hidden">
+        <div class="mgFeedback" style="background:rgba(255,215,0,0.15); border:1px solid var(--gold-bright); border-radius:8px; padding:12px; margin:12px 0;">
+          🎉 <strong>КОРОЛЕВСКИЙ СТРАЙК! 💥🧀</strong><br>
+          Тоник с громким треском протаранил сырные кегли и наелся до отвала: <em>«ХРУМ-ХРУМ! Обожаю хондорский сыр! Дорожка свободна, держи победный код: <strong>CHEESE_STRIKE</strong>!»</em>
+        </div>
+
+        <div class="liveQuestCard" style="background:rgba(138,43,226,0.18); border:1px solid #a855f7; border-radius:10px; padding:14px; margin:14px 0; text-align:left;">
+          <div style="color:#e9d5ff; font-weight:bold; font-size:15px; margin-bottom:6px;">🎭 ЖИВОЙ ТУРНИР АРХФЕЕВ (БОУЛИНГ):</div>
+          <div style="font-size:13px; line-height:1.5; color:#f3e8ff;">
+            Ария, Ильярион, Оривия, Мелари и Линар выходят на реальную дорожку боулинга!<br>
+            • Каждый делает свои победные броски.<br>
+            • За каждый страйк или удачный спэр — королевские аплодисменты и тосты отряда!<br>
+            • Когда партия сыграна — введите шифр ниже, чтобы принять сигнал из Лаборатории Алхимиков!
+          </div>
+        </div>
+
+        <div id="bowlingCipherMount"></div>
+      </div>
+    `;
+
+    const launchBtn = bodyEl.querySelector('#launchTonikBtn');
+    const rollingTonik = bodyEl.querySelector('#rollingTonik');
+    const pins = bodyEl.querySelectorAll('.cheesePin');
+    const successSec = bodyEl.querySelector('#bowlingSuccessSection');
+    const cipherMount = bodyEl.querySelector('#bowlingCipherMount');
+
+    let launched = false;
+    launchBtn.addEventListener('click', () => {
+      if (launched) return;
+      launched = true;
+      launchBtn.disabled = true;
+
+      if (window.AudioEngine) {
+        window.AudioEngine.playClick();
+      }
+
+      // Анимация полета Тоника
+      rollingTonik.style.transform = 'translateX(-50%) translateY(-65px) scale(1.3) rotate(720deg)';
+
+      setTimeout(() => {
+        // Удар по кеглям
+        if (window.AudioEngine) {
+          window.AudioEngine.playShatter();
+          window.AudioEngine.playSuccess();
+        }
+        triggerScreenStrobe('#ffd700', 3);
+
+        pins.forEach((pin, idx) => {
+          const deg = (idx - 2) * 35;
+          const dist = 30 + Math.random() * 25;
+          pin.style.transform = `translate(${deg * 1.5}px, -${dist}px) rotate(${deg * 2}deg) scale(0.6)`;
+          pin.style.opacity = '0.3';
+        });
+
+        rollingTonik.innerHTML = '🐀🧀✨';
+
+        setTimeout(() => {
+          successSec.classList.remove('hidden');
+          successSec.scrollIntoView({ behavior: 'smooth' });
+
+          renderCipherSection(cipherMount, {
+            prompt: 'Введи победный шифр боулинга Хондора:',
+            code: 'CHEESE_STRIKE',
+            onSuccess: () => {
+              if (window.App) {
+                window.App.unlockCharacter('melari');
+                window.App.unlockCharacter('linar');
+              }
+              setTimeout(() => {
+                close();
+                if (callbacks.onComplete) callbacks.onComplete();
+              }, 400);
+            }
+          });
+        }, 600);
+      }, 550);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 17. АЛТАРЬ ВОЗРОЖДЕНИЯ ХОНДОРА И КОРОЛЕВА ЛЕСА (Финал Акта III)
   // ---------------------------------------------------------------------------
   function renderFinalAltar(loc, callbacks) {
     bodyEl.innerHTML = `
       <div class="mgDescription combatAlert">
         <strong>🎭 ВРАТА ВЕЧНОСТИ — ДВА ВОССОЕДИНЁННЫХ ДУХА БЕЗЛИКИХ (ЧЕЛОВЕК И ЭЛЬФ):</strong><br>
-        Перед вашим трио (<strong>Ария, Великий Архивариус Ильярион и Оривия</strong>) парят воссоединенные в посмертии души Человека и Эльфа, чья трагическая любовь и 11 нарушенных обещаний когда-то породили проклятие Хондора.<br>
+        У врат Родового Оплота перед <strong>Арией, Великим Архивариусом Ильярионом и всем отрядом</strong> парят воссоединённые души Человека и Эльфа, чья трагическая любовь и 11 нарушенных обещаний когда-то породили проклятие Хондора.<br>
         Все 4 реликвии собраны: <strong>🌳 Древо • 🧪 Эликсир • 🗿 Гранит • 🗝 Ключ</strong>!
       </div>
       <div id="finalCipherMount"></div>
