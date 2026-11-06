@@ -1194,15 +1194,15 @@ const Minigames = (() => {
     function renderStage2() {
       bodyEl.innerHTML = '';
       renderTonikLiveQuestCard(bodyEl, {
-        title: 'Испытание Стража Виталиуса, Жрицы Оксаниэль и Провидицы Софиэль',
-        subtitle: 'Вы проходите это испытание вашим активным трио (<strong>Ария, Великий Архивариус Ильярион и Оривия</strong>)! А пока вы ищете тайный след в реальности, Тоник внутри Гримуара тоже старается изо всех сил:',
-        actorGenitive: 'Стража Виталиуса, Жрицы Оксаниэль и Провидицы Софиэль',
+        title: 'Экзамен Великого Архивариуса Ильяриона',
+        subtitle: 'Каменный ларчик Горгульи открыт, но на нём сияет звёздная печать Архфея! Великий Архивариус Ильярион лично проверяет, крепка ли память Арии о хрониках Хондора:',
+        actorGenitive: 'Великого Архивариуса Ильяриона',
         animClass: 'anim-granite-strain',
-        propLeft: '🔦',
+        propLeft: '📜',
         propRight: '🗿',
-        particles: '💎 🔦 👑 🪨',
-        caption: '🐀 Тоник пытается пройти квест в Оплоте Гранита: светит крошечным фонариком себе в глаз и кряхтит с надутыми щеками, пытаясь сдвинуть с места гранитный камешек!',
-        cipherPrompt: 'Введи рунный шифр Третьей Печати Гранита, врученной тебе в Оплоте Гранита:',
+        particles: '💎 📜 👑 🪨',
+        caption: '🐀 Тоник затаил дыхание в кристалле Гримуара и благоговейно слушает каверзные вопросы Великого Архивариуса Ильяриона, шевеля усами и подсказывая Арии одними губами!',
+        cipherPrompt: 'Ответь на 3 вопроса Архивариуса и введи полученный от него рунный шифр Третьей Печати:',
         code: 'SEAL_RUNE',
         onSuccess: () => {
           if (window.App) {
@@ -1210,6 +1210,7 @@ const Minigames = (() => {
             window.App.unlockCharacter('vitalik');
             window.App.unlockCharacter('oksana');
             window.App.unlockCharacter('sofa');
+            window.App.unlockCharacter('ilya');
           }
           close();
           if (callbacks.onComplete) callbacks.onComplete();
@@ -1221,7 +1222,7 @@ const Minigames = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // 15. ШЕПЧУЩАЯ АЛЛЕЯ: ТРОЙНОЙ БОЙ (АРИЯ, ИЛЬЯРИОН, ОРИВИЯ) ПРОТИВ ЯНИЭЛЬ И ВОЛКОЗАРА
+  // 15. ШЕПЧУЩАЯ АЛЛЕЯ: ТРОЙНОЙ БОЙ (АРИЯ, ИЛЬЯРИОН, ОРИВИЯ) И ТОРГ ОРИВИИ ЗА КЛЮЧ
   // ---------------------------------------------------------------------------
   function renderHuntersAlley(loc, callbacks) {
     let step = 1;
@@ -1229,12 +1230,12 @@ const Minigames = (() => {
     function renderStage1() {
       bodyEl.innerHTML = `
         <div class="mgDescription combatAlert">
-          <strong>🗡️ ДУЭЛЬ В ШЕПЧУЩЕЙ АЛЛЕЕ (Ария, Ильярион и Оривия против Охотников):</strong><br>
-          Охотница Яниэль крутит клинок: «Ария, Ильярион, Оривия — покажите нам свою боевую связку, прежде чем приступить к нашему живому испытанию за Ключ!»
+          <strong>🗡️ РАЗГРОМ ТЕНЕВОГО АУКЦИОНА В ШЕПЧУЩЕЙ АЛЛЕЕ:</strong><br>
+          Теневой Аукционист Безликого пытается скрыть Кованый Ключ! Проведите тройную комбо-атаку отряда (Ария ➔ Ильярион ➔ Оривия), чтобы сокрушить тени и выбить реликвию!
         </div>
         <div id="huntersStatus" class="mgCombatStatus">Боевая готовность: Тройной ход отряда (Ария ➔ Ильярион ➔ Оривия)!</div>
         <div class="mgChoicesCol">
-          <button id="huntFaerieBtn" class="pixelBtn">✨ Шаг 1 [Ход Арии]: Кастовать «Огонь Фей» (Озарить Охотницу Яниэль)</button>
+          <button id="huntFaerieBtn" class="pixelBtn">✨ Шаг 1 [Ход Арии]: Кастовать «Огонь Фей» (Ослепить Аукциониста)</button>
           <button id="huntShatterBtn" class="pixelBtn secondary" disabled>🔮 Шаг 2 [Ход Ильяриона]: Кастовать «Звёздные Дребезги Архфея»</button>
           <button id="huntOriviaBtn" class="pixelBtn secondary" disabled>⚔️ Шаг 3 [Ход Оривии]: Врубить «Ультиматум Теневого Барона» (50 монет сейчас, 50 потом!)</button>
         </div>
@@ -1253,7 +1254,7 @@ const Minigames = (() => {
           window.AudioEngine.vibrate([120, 60, 180]);
         }
         triggerScreenStrobe('#00e5ff', 6);
-        statusEl.innerHTML = '🗡️ Охотница Яниэль: «Ого! Настоящее сияние Королевы Леса! Теперь ход Ильяриона!»';
+        statusEl.innerHTML = '✨ Огонь Фей ослепил тени Аукциониста! Ильярион, сокрушай звёздной магией!';
         b1.disabled = true;
         b1.textContent = '✔ [Ход Арии]: Огонь Фей активирован!';
         b2.disabled = false;
@@ -1268,7 +1269,7 @@ const Minigames = (() => {
           window.AudioEngine.vibrate([350, 100, 350]);
         }
         triggerScreenStrobe('#f5cf47', 5);
-        statusEl.innerHTML = '🔮 Великий Архивариус Ильярион сотрясает землю Звёздными Дребезгами! Оривия, добивай ультиматумом!';
+        statusEl.innerHTML = '🔮 Великий Архивариус Ильярион сотрясает землю Звёздными Дребезгами! Аукционист роняет шкатулку! Оривия, добивай ультиматумом!';
         b2.disabled = true;
         b2.textContent = '✔ [Ход Ильяриона]: Звёздные Дребезги обрушены!';
         b3.disabled = false;
@@ -1283,7 +1284,7 @@ const Minigames = (() => {
           window.AudioEngine.vibrate([200, 80, 250]);
         }
         triggerScreenStrobe('#ff6f00', 4);
-        statusEl.innerHTML = '⚔️ Оривия: «50 монет сейчас, 50 потом — сделка закрыта!»';
+        statusEl.innerHTML = '⚔️ Оривия: «50 монет сейчас, 50 потом — шкатулка наша!»';
         b3.disabled = true;
         b3.textContent = '✔ [Ход Оривии]: Ультиматум принят!';
         setTimeout(() => renderStage2(), 450);
@@ -1293,19 +1294,21 @@ const Minigames = (() => {
     function renderStage2() {
       bodyEl.innerHTML = '';
       renderTonikLiveQuestCard(bodyEl, {
-        title: 'Испытание Охотницы Яниэль и Сэра Волкозара',
-        actorGenitive: 'Охотницы Яниэль и Сэра Волкозара',
+        title: 'Торг Теневого Барона Оривии (Леры)',
+        subtitle: 'Шкатулка Аукциониста разбита, и Оривия ловко подхватывает Кованый Ключ! Но по воровскому кодексу Теневой Барон требует 3 платы за реликвию:',
+        actorGenitive: 'Теневого Барона Оривии',
         animClass: 'anim-hunter-bow',
-        propLeft: '🏹',
+        propLeft: '🗡️',
         propRight: '🗝️',
-        particles: '🏹 ❄️ 🐾 🗝️',
-        caption: '🐀 Тоник пытается выполнить квест Охотницы Яниэль и Сэра Волкозара: натянул тетиву игрушечного лука и сам улетел вместо стрелы прямиком в пушистый сугроб!',
-        cipherPrompt: 'Введи рунный шифр, выгравированный на старинном кованом Ключе от Алтаря:',
+        particles: '🗡️ 💰 🐾 🗝️',
+        caption: '🐀 Тоник в кристалле Гримуара прижал лапки к щекам и в ужасе считает золотые: неужели Оривия действительно отберёт у нас 50 монет сейчас и 50 потом?!',
+        cipherPrompt: 'Выполни 3 платы Теневому Барону (камень-ножницы-бумага, похвала полуорку и объятия) и введи шифр Ключа:',
         code: 'KEY_HUNTER',
         onSuccess: () => {
           if (window.App) {
             window.App.unlockSeal('key_hunter');
             window.App.unlockCharacter('auctioneer');
+            window.App.unlockCharacter('orivia');
             window.App.unlockCharacter('yana');
             window.App.unlockCharacter('yana_bf');
           }
