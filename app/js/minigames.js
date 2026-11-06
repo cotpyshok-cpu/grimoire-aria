@@ -1294,7 +1294,7 @@ const Minigames = (() => {
     function renderStage2() {
       bodyEl.innerHTML = '';
       renderTonikLiveQuestCard(bodyEl, {
-        title: 'Торг Теневого Барона Оривии (Леры)',
+        title: 'Торг Теневого Барона Оривии',
         subtitle: 'Шкатулка Аукциониста разбита, и Оривия ловко подхватывает Кованый Ключ! Но по воровскому кодексу Теневой Барон требует 3 платы за реликвию:',
         actorGenitive: 'Теневого Барона Оривии',
         animClass: 'anim-hunter-bow',
